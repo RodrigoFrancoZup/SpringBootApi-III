@@ -1,0 +1,26 @@
+Capítulo 01 - Mais segurança
+Nesse capítulo aprendemos:
+
+⦁	Que é importante atualizar a versão do nosso framework Spring;
+
+⦁	Que ao atualizar o Spring agluns Bugs podem ocorrer, então temos que ter cuidado! Antes de atualizar o Spring é recomendável ler os documentos oficiais sobre a atualização, pois eles vão indicar o que mudou e quais correções devemos faze - https://github.com/spring-projects/spring-boot
+
+⦁	Versão normalmente é definida por X.Y.Z (3.2.1), onde:
+X = Major (Grandes mudanças, normalmente vai haver quebra de compatibilidade);
+Y = Minor (Ocorre novas funcionalidades, mas normalmente não haverá quebra de compatibilidade);
+Z = Patch (Ocorre para correções de falhas e bugs. Dificilmente haverá quebra de compatibilidade);
+
+⦁	Lembra que nosso Usuario tinha como atributo uma lista de perfil (List<Perfil> perfis). Mas nos não estamos usando isso. Para que serve isso? Para controlar o acesso de um tipo de usuário, por exemplo: apenas moderadores podem apagar (DELETE) um tópico.
+
+⦁	Precisamos mudar nosso banco de dados, vamos incluir na tabela Perfil os registros: 'ROLE_MODERADOR' e 'ROLE_ALUNO' (O Spring exige o "ROLE_");
+
+⦁	Precisamos mudar nosso banco de dados, vamos incluir na tabela Usuario um novo registro;
+
+⦁	Precisamos agora vincular os usuários com seu perfil, para isso vamos alterar a tablea Usuario_Perfis, inserindo o ID do Usuario e o ID do Perfil que o mesmo está vinculado;
+
+⦁	Agora no nosso código devemos fazer uma verificação por Perfil de Usuário. Faremos isso na classe SecurityConfiguration, no método configure(HttpSecurity http). Antes da linha .anyRequest().authenticated() devemos por: 
+.antMatchers(HttpMethod.DELETE, "/topicos/*").hasRole("MODERADOR")
+
+	Nesse caso o método Delete com URL /topicos/... só poderá ser executado por um Usuario com Perfil MODERADOR (Obs: aqui não precisamos por 'ROLE_...')
+
+	Bug que estava ocorrendo: Na classe Usuário o método getAuthorities() tem que retornar a lista de perfis
