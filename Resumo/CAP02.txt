@@ -1,0 +1,30 @@
+Capítulo 02 - Profiles 
+Nesse capítulo aprendemos:
+
+-Que o software passa por diversos cenários (ambientes), incialmente ele está no cenário de desenvolvimento, depois passa para o de teste e por fim vai para o cliente que é chamado de ambiente de Produção;
+
+-Podemos definir uma configuração/funcionalidades por cénario, por exemplos: 
+	Exemplo 1 - no cenário de desenvolvimento quero desativar o a autenticação, pois é muito chato toda vez que eu for testar uma funcionalidade ter que ficar pedindo token.
+	Exemplo 2 - no ambiente de desenvolvimento quero utilizar o banco de dados H2 (bando em memória) já no ambiente de produção quero utilizar o MySql, vou ter que ficar alterando toda hora o arquivo application.properties para fazer essa troca ? E se eu esquercer ?
+
+-Para facilitar essa divisão de configuração/funcionalidades por cenário (ambiente) nós temos o recurso chamado Profile;
+
+-Criando um profile passo a passo para desativar as autenticações no ambiente de desenvolvimento:
+1- Vamos duplicar a classe SecurityConfiguration (ctrl-x + crtl-v) e nomeá-la com DevSecurityConfiguration;
+
+2- Vamos anotar a classe DevSecurityConfiguration com a anotação @Profile("dev"). Assim essa classe só será utilizada quando o ambiente for dev;
+
+3- Na classe SecurityConfiguration vamos por a anotação @Profile("prod"). Temos que fazer isso porque toda classe sem anotação @Profile é carregada em todos os ambientes pelo Spring, assim ao utilizar o ambiente dev as duas classes serião utilizadas e daria erro;
+
+4- Anotar a classe @Profile("prod") na classe AutenticacaoController;
+
+5- Agora devemos indicar a IDE com qual Ambiente queremos executar o programa naquele momento. O padrão se não indicarmos é executar todas as classes sem o @Profile;
+
+6- Para indicar a IDE Eclipse: botão direito no projeto -> Run As -> Run Configurations -> Java Application -> Selecionar o seu Projeto -> Ir na aba arguments -> No campo VM arguments colocar: -Dspring.profiles.active=dev
+
+7- Para conseguir realizar esse nosso cénario vamos apagar tudo da classe DevSecurityConfiguration, deixando apenas o método configure(HttpSecurity http) com o seguinte trecho:
+protected void configure(HttpSecurity http) throws Exception { 
+	http.authorizeRequests() .antMatchers(HttpMethod.GET,"/	**").permitAll() .and().csrf().disable(); 
+}
+
+Com isso vamos dar total acesso a nossa API para todos usuários quando estivermos no ambiente de DEV.
