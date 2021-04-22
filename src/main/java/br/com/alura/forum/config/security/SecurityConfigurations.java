@@ -20,7 +20,7 @@ import br.com.alura.forum.repository.UsuarioRepository;
 
 @EnableWebSecurity
 @Configuration
-@Profile("prod")
+@Profile({"prod", "test"})
 public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 
 	//Responsável pela autenticação. 

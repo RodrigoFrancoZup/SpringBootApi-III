@@ -1,0 +1,90 @@
+Capítulo 03 - Testes automatizados 
+Nesse capítulo aprendemos:
+
+⦁	Realizar testes automatizados é excelente prática para garantir a qualidade do código. Com ele temos certerza que o código ta funcionando e garante se um ajuste no código não afetou algo que já estava funcionando;
+
+⦁	Para o Java temos a biblioteca JUnit;
+
+⦁	Springboot também tem um módulo para escrevermos testes, e a dependência já vem por padrão. Confira no arquivo pom.xml;
+
+⦁	A biblioteca de teste de Springboot por padrão espera que a gente esteja utilizando um banco de dados que roda em memória, por exemplo H2. Para utilizarmos outro banco temos que adicionar mais anotações;
+
+⦁	O pacote para criamos as classes de testes também já vem por padrão, assim como uma classe de exemplo;
+
+⦁	Para criarmos um teste para uma determinada classe devemos clicar na classe a ser testada com botão direito -> new -> (filtrar por junit) escolher a opção Junit Test Case.
+
+⦁	Hoje o Padão de teste SpringBoot usa o Jupiter, caso for usar Junit 4 terá que usar a anotação em cima da classe: @RunWith(SpringRunner.class)
+
+⦁	Passo a passado para criar o teste do CursoRepository:
+
+	1- Clicar com botão direito da classe CursoRepository -> direito -> new -> (filtrar por junit) escolher a opção Junit Test;
+
+	2- Anotar a classe com: @DataJpaTest, anotação necessária para testar um Repsotiroy, pois com ela teremos controle de transação, entity manager e outros recursos de persistencia;
+
+	3- Anotar a classe com uma segunda anotação, no caso: @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+	Essa é obrigátorio se você não estiver usando o banco H2;
+
+	4- Devemos criar uma banco de dados somente para teste, então no mysql vamos criar o banco de dados alura_api_test e deixá-lo vazio. Pois vamos testar também a inserção de registro;
+
+	5- Como vamos configurar esse banco de dados em nossa API? Duplicando o application.properties, e depois mudar o nome para application-test.properties. Colocar nesse novo arquivo o endereço do banco de dados. Podemos deixar nesse arquivo apenas dados da datasource e do jpa. Esse arquivo será carregado quando o Profile da execução for de test;
+
+	6- Aprendemos a definir um Profile ao executar a API pela IDE, mas e agora para executar o teste e definir o ambiente (cenárIo) como fazer? Adicionando a anotação em cima da classe de test (no caso CursoRepositoryTest): @ActiveProfiles("test")
+
+	7- Caso tivéssemos um arquivo de SQL rodando para povoar o banco, deveríamos utilizar no application-test.properties o seguinte comando para bloquear isso: 
+	spring.datasource.initialization-mode=never
+
+	8- Criar na classe o atributo TestEntityManager em e anotá-lo com  @Autowired;
+
+	9- Agora com o TestEntityManager podemos criar um curso no banco, buscar ele pelo Repository e testar comparando os valores. Código ficará assim:
+
+@Test 
+public void deveriaCarregarUmCursoAoBuscarPeloSeuNome() { 
+	Curso curso = new Curso(); 
+	curso.setNome("HTML 5"); 
+	curso.setCategoria("Programacao"); 
+	em.persist(curso); 
+	String nomeCurso = "HTML 5"; 
+	Curso cursoEncontado = cursoRepository.findByNome(nomeCurso); Assert.assertNotNull(cursoEncontado); 
+	Assert.assertEquals(nomeCurso, cursoEncontado.getNome()); 
+}
+
+Outro teste:
+
+@Test 
+	public void deveRetonarNullComAoRealizarBuscaComNomeDeCursoQueNaoExiste() { 
+	String nomeCurso = "NÃO EXISTE"; 
+	Curso curso = cursoRepository.findByNome(nomeCurso); Assert.assertNull(curso); 
+}
+
+⦁	Passo a passo para testar a classe do Tipo Controller, no caso a classe AutenticacaoController:
+Obs sobre esse item: Normalmente para testar controller podemos usar a anotação @WebMvcTest, mas como vamos testar um controller de autenticação, precisamos de mais recursos e ela não serve.
+
+Passo a passo para testar se realmente ocorre badrequest:
+
+	1- Clicar com botão direito da classe AutenticacaoController -> direito -> new -> (filtrar por junit) escolher a opção Junit Test. A classe AutenticacaoControllerTest foi criada;
+
+	2- Na classe AutenticacaoController alterar a anotação @Profile, ela deve ficar assim: @Profile({"prod", "test"});
+
+	3- Na classe SecurityConfigurations alterar a anotação @Profile, ela deve ficar assim: @Profile({"prod", "test"});
+
+	4- Nesse teste vamos ter que simular um navegador ou o Postman, pois vamos ter que consumir uma URI. Quem fará isso nesse caso será o MockMvc. Para isso criar nessa classe o atributo MockMvc mockMvc e anotá-lo com @Autowired;
+
+5- Essa classe de teste tem que ter as anotações:  
+@ActiveProfiles("test")
+@AutoConfigureMockMvc
+@SpringBootTest
+
+6- O método ficará assim:
+@Test 
+void deveriaDevolverStatus400AoPassarmosDadosIncorretos() throws Exception   { 
+	URI uri = new URI("/auth"); 
+	String json = "{\"email\": \"invalido@email.com\",\"senha:123321\"}"; 
+	mockMvc 
+	.perform(MockMvcRequestBuilders 
+		.post(uri) 
+		.content(json) 
+		.contentType(MediaType.APPLICATION_JSON)) 
+	.andExpect(MockMvcResultMatchers 
+		.status() 
+		.is(400));
+ }

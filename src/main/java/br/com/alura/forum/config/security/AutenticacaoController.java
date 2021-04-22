@@ -19,7 +19,7 @@ import br.com.alura.forum.modelo.form.LoginForm;
 
 @RestController
 @RequestMapping("/auth")
-@Profile("prod")
+@Profile({"prod", "test"})
 public class AutenticacaoController {
 
 	//Spring por padrao n sabe criar esse obj
