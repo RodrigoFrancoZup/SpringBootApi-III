@@ -44,22 +44,25 @@ public void deveriaCarregarUmCursoAoBuscarPeloSeuNome() {
 	curso.setCategoria("Programacao"); 
 	em.persist(curso); 
 	String nomeCurso = "HTML 5"; 
-	Curso cursoEncontado = cursoRepository.findByNome(nomeCurso); Assert.assertNotNull(cursoEncontado); 
-	Assert.assertEquals(nomeCurso, cursoEncontado.getNome()); 
+	Curso cursoEncontado = cursoRepository.findByNome(nomeCurso); assertNotNull(cursoEncontado); 
+	assertEquals(nomeCurso, cursoEncontado.getNome()); 
 }
 
 Outro teste:
 
 @Test 
-	public void deveRetonarNullComAoRealizarBuscaComNomeDeCursoQueNaoExiste() { 
+public void deveRetonarNullComAoRealizarBuscaComNomeDeCursoQueNaoExiste() { 
 	String nomeCurso = "NÃO EXISTE"; 
-	Curso curso = cursoRepository.findByNome(nomeCurso); Assert.assertNull(curso); 
+	Curso curso = cursoRepository.findByNome(nomeCurso); 
+	assertNull(curso); 
 }
+
+	Obs: Import dos assert deve ser o Static do pacote Jupiter.
 
 ⦁	Passo a passo para testar a classe do Tipo Controller, no caso a classe AutenticacaoController:
 Obs sobre esse item: Normalmente para testar controller podemos usar a anotação @WebMvcTest, mas como vamos testar um controller de autenticação, precisamos de mais recursos e ela não serve.
 
-Passo a passo para testar se realmente ocorre badrequest:
+	Passo a passo para testar se realmente ocorre badrequest:
 
 	1- Clicar com botão direito da classe AutenticacaoController -> direito -> new -> (filtrar por junit) escolher a opção Junit Test. A classe AutenticacaoControllerTest foi criada;
 
@@ -69,12 +72,12 @@ Passo a passo para testar se realmente ocorre badrequest:
 
 	4- Nesse teste vamos ter que simular um navegador ou o Postman, pois vamos ter que consumir uma URI. Quem fará isso nesse caso será o MockMvc. Para isso criar nessa classe o atributo MockMvc mockMvc e anotá-lo com @Autowired;
 
-5- Essa classe de teste tem que ter as anotações:  
-@ActiveProfiles("test")
-@AutoConfigureMockMvc
-@SpringBootTest
+	5- Essa classe de teste tem que ter as anotações:  
+	@ActiveProfiles("test")
+	@AutoConfigureMockMvc
+	@SpringBootTest
 
-6- O método ficará assim:
+	6- O método ficará assim:
 @Test 
 void deveriaDevolverStatus400AoPassarmosDadosIncorretos() throws Exception   { 
 	URI uri = new URI("/auth"); 

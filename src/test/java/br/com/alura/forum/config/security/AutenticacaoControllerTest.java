@@ -2,7 +2,6 @@ package br.com.alura.forum.config.security;
 
 import java.net.URI;
 
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,9 +14,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 
 @ActiveProfiles("test")
-@AutoConfigureMockMvc
 @SpringBootTest
-class AutenticacaoControllerTest {
+@AutoConfigureMockMvc
+public class AutenticacaoControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -36,5 +35,7 @@ class AutenticacaoControllerTest {
 				.status()
 				.is(400));
 	}
+
+
 
 }

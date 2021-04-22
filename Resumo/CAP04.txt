@@ -1,0 +1,62 @@
+Capítulo 04 - Deploy 
+Nesse capítulo aprendemos:
+
+⦁	O padrão de Build do Sprgin Boot é uma JAR (padrão para aplicações Java tradicionais), pois um Projeto Spring Boot não vai ser colocado dentro de um servidor. O projeto já tem um servidor (dentro de si);
+
+⦁	O padrão WAR é para projetos Java Web que serão colocados dentro de um servidor. Esse arquivo WAR é colocado dentro de uma pasta do servidor;
+
+⦁	Como fazer Build? Várias maneiras:
+	Maneira 1- Dentro da IDE, clicando botão direito no Projeto -> Run As -> Maven Install; 
+	Maneira 2 - Dentro da IDE, clicando botão direito no Projeto -> Run As -> Maven Build -> Em Goals colocar: clean package; 
+	Maneira 3 -> Entrar com terminal no diretório raiz do projeto -> rodar o comando: clean package (nessa maneira precisa ter Maven instalado)
+	O resultado do build é gerado na pasta target do projeto.
+
+⦁	Comando para rodar um JAR: java -jar NomDoArquivo
+Esse comando deve ser escrito dentro da pasta target do projeto e via terminal;
+
+⦁	Passo a passo para personalizar Build em JAR:
+1- Para criar configurações específicas para build devemos duplicar o arquivo application.properties, mas chamá-lo de application-prod.properties;
+
+2- Nesse arquivo application-prod.properties temos que configurar para ele receber os dados do banco de dados através de variáveis de ambiente. Deve ficar assim:
+spring.datasource.url=${FORUM_DATABASE_URL}spring.datasource.username=${FORUM_DATABASE_USERNAME}spring.datasource.password=${FORUM_DATABASE_PASSWORD}forum.jwt.secret=${FORUM_JWT_SECRET}
+
+3- Personalizar o nome do arquivo JAR gerado. Dentro da tag <build> do arquivo pom.xml colocar a tag:
+<finalName>forum</finalName>
+
+4- Vamos realizar a build (mvn clean package), e agora o arquivo vai chamar forum.jar;
+
+5- Vamos agora executar o JAR passando as variáveis de ambiente e o ambiente (cenário) desejado. Há duas maneiras para isso (para passar as variáveis)
+Maneira 1 (Passando tudo por comando, tudo na mesma linha): 
+java -jar -Dspring.profiles.active=prod forum.jar
+-DFORUM_DATABASE_URL=jdbc:mysql://localhost/alura_api
+-DFORUM_DATABASE_USERNAME=root
+-DFORUM_DATABASE_PASSWORD=mysql
+-DFORUM_JWT_SECRET=rm%27!%40N%3DKe!~p8VTA2ZRK~nMDQX5Uvm!m%27D&%5D%7B@vr/?G;2?XhbC:Qa#9#eMLN\}x3?JR3.2zr~v)gYF^8\:8%3E:XfB:Ww75N/emt9Yj[bQMNCWwW\J?N,nvH.%3C2\.r~w]*e~vgak)X%22v8H%60MH/7%222E%60,^k@n%3CvE-wD3g9JWPy;CrY*.Kd2_D])=%3E%3CD?YhBaSua5hW%{2]_FVXzb9%608FH^b[X3jzVER&:jw2%3C=c38=%3EL/zBq%60}C6tT*cCSVC^c]-L}&/
+
+Maneira 2:
+Roda primeiramente os comandos EXPORT + VARIAVEL DE AMBIENTE, e depois o java jar, por exemplo:
+Primeiro:
+export FORUM_DATABASE_URL=jdbc:mysql://localhost/alura_api
+export FORUM_DATABASE_USERNAME=root
+export FORUM_DATABASE_PASSWORD=mysql
+export FORUM_JWT_SECRET=rm%27!%40N%3DKe!~p8VTA2ZRK~nMDQX5Uvm!m%27D&%5D%7B@vr/?G;2?XhbC:Qa#9#eMLN\}x3?JR3.2zr~v)gYF^8\:8%3E:XfB:Ww75N/emt9Yj[bQMNCWwW\J?N,nvH.%3C2\.r~w]*e~vgak)X%22v8H%60MH/7%222E%60,^k@n%3CvE-wD3g9JWPy;CrY*.Kd2_D])=%3E%3CD?YhBaSua5hW%{2]_FVXzb9%608FH^b[X3jzVER&:jw2%3C=c38=%3EL/zBq%60}C6tT*cCSVC^c]-L}&/
+Depois:
+java -jar -Dspring.profiles.active=prod forum.jar
+
+⦁	Criando um WAR:
+
+1- No arquivo pom.xml, em baixo da tag <description> colocar a tag:
+<packaging>war</packaging>;
+
+2- Adicionar a  dependencia:
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-tomcat</artifactId>
+	<scope>provided</scope>
+</dependency>
+
+3- Na classe principal, onde tem metodo main(), no nosso caso chama ForumApplication, devemos fazer essa classe extends SpringBootServletInitializer e sobrescrever o seu método configure();
+
+4- No metodo configure(), deixar seu retorno com:
+return builder.sources(ForumApplication.class); 
+// Nome da classe principal como parâmetro.
