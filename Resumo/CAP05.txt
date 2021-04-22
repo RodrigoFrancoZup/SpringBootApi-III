@@ -1,0 +1,28 @@
+Capítulo 05 - Deploy com Docker e na nuvem
+Nesse capítulo aprendemos:
+
+-Criando passo a passo o Dockerfile:
+
+	1- Botao direito no projeto -> new -> new file -> criar com nome Dockerfile
+
+	2- No Dockerfile colocar esse código:
+	FROM openjdk:8-jdk-alpine 
+	RUN addgroup -S spring && adduser -S spring -G spring 
+	USER spring:spring 
+	ARG JAR_FILE=target/*.jar 
+	COPY ${JAR_FILE} app.jar 
+	ENTRYPOINT ["java","-Xmx512m","-Dserver.port=${PORT}","-jar","/app.jar"]
+
+	3- Com terminal ir na pasta raiz do projeto e executa o comando:
+	docker build -t alura/forum .
+
+	// -t para dar nome pra imagem e o . para falar que é para utilizar o dockerfile deste diretorio para gerar a imagem
+
+-Criar um container com essa imagem:
+
+	1- Rodar comando: docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE='PROD' -e FORUM_DATABASE_URL='jdbc:mysql://localhost/alura_api' -e FORUM_DATABASE_USERNAME='root' -e FORUM_DATABASE_PASSWORD='mysql' -e FORUM_JWT_SECRET='123456' alura/forum
+
+
+
+
+
